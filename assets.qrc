@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>icon/border.png</file>
+        <file>icon/close.png</file>
+        <file>icon/minus.png</file>
+        <file>icon/add-bottom-line.png</file>
+        <file>icon/add-top-line.png</file>
+        <file>icon/col-align-center.png</file>
+        <file>icon/col-align-left.png</file>
+        <file>icon/col-align-right.png</file>
+        <file>icon/delete-bottom-line.png</file>
+        <file>icon/delete-top-line.png</file>
+        <file>icon/global-align-center.png</file>
+        <file>icon/global-align-left.png</file>
+        <file>icon/global-align-right.png</file>
+    </qresource>
+</RCC>
