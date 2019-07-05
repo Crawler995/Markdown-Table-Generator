@@ -31,8 +31,11 @@ private:
     const int ITEM_BORDER_WIDTH;
     const Qt::Alignment DEFAULT_ALIGN;
 
-    void connectSlots();
 
+    void connectSlots();
+    void initAllItemContent();
+    void initRowItemContent(int row);
+    void initColItemContent(int col);
     void initStyle();
     void moveAnimation(int row, int col);
     QRect getItemBorderRect(int row, int col);
@@ -66,9 +69,13 @@ private slots:
 
     void clearAll();
 
+    void changeCurrentItemContent(const QString &content);
     void alignCurEditedItem(int row, int col);
 
     void generateMarkdownTextToClipBoard();
+
+signals:
+    void itemContentChanged(const QString &content);
 };
 
 #endif // EDITTABLE_H
