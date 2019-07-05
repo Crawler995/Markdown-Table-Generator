@@ -40,6 +40,7 @@ EditTable::EditTable(int row, int col, QWidget *parent) :
     setCornerButtonEnabled(false);
 
     initStyle();
+    initAllItemContent();
 
     menu = new RightBtnMenu(this);
     border = nullptr;
@@ -111,17 +112,37 @@ void EditTable::connectSlots() {
             this, SLOT(clearAll()));
 }
 
+void EditTable::initAllItemContent() {
+    for(int i = 0; i < rowCount(); i++) {
+        for(int j = 0; j < columnCount(); j++) {
+            setItem(i, j, new QTableWidgetItem(""));
+        }
+    }
+}
+
+void EditTable::initRowItemContent(int row) {
+    for(int i = 0; i < columnCount(); i++) {
+        setItem(row, i, new QTableWidgetItem(""));
+    }
+}
+
+void EditTable::initColItemContent(int col) {
+    for(int i = 0; i < rowCount(); i++) {
+        setItem(i, col, new QTableWidgetItem(""));
+    }
+}
+
 void EditTable::initStyle() {
     setStyleSheet("QHeaderView{background-color: " + ColorBoard::orange + "; color: " + ColorBoard::white + ";}"
                   "QHeaderView::section{background-color: " + ColorBoard::orange + "; border: none;}"
-                  "QTableWidget{background: transparent; border: " + QString::number(ITEM_BORDER_WIDTH) + "px solid " + ColorBoard::darkGray + ";}"
+                  "QTableWidget{background: transparent; border: " + QString::number(ITEM_BORDER_WIDTH) + "px solid " + ColorBoard::orange + ";}"
                   "QTableWidget::item{background: transparent; border-bottom: " + QString::number(ITEM_BORDER_WIDTH) + "px solid " + ColorBoard::gray + ";"
                   "border-right: " + QString::number(ITEM_BORDER_WIDTH) + "px solid " + ColorBoard::gray + ";}"
                   "QTableWidget::item:selected{color: black;}"
                   "QTableView QTableCornerButton::section{background-color: " + ColorBoard::orange + ";}");
 
-    horizontalHeader()->setStyleSheet("QHeaderView::section{border-right: 2px solid " + ColorBoard::gray + ";}");
-    verticalHeader()->setStyleSheet("QHeaderView::section{border-bottom: 2px solid " + ColorBoard::gray + ";}");
+    horizontalHeader()->setStyleSheet("QHeaderView::section{border-right: 2px solid " + ColorBoard::lightGray + ";}");
+    verticalHeader()->setStyleSheet("QHeaderView::section{border-bottom: 2px solid " + ColorBoard::lightGray + ";}");
 
     horizontalScrollBar()->setStyleSheet("QScrollBar{background:transparent; height:10px;}"
     "QScrollBar::handle{background:lightgray; border:2px solid transparent; border-radius:5px;}"
@@ -236,7 +257,7 @@ QString EditTable::generateMarkdownText() {
     }
 
     res = titlesMarkdownText + "\n" + alignsMarkdownText + "\n" + itemsMarkdownText;
-    qDebug() << res;
+
     return res;
 }
 
@@ -280,6 +301,10 @@ void EditTable::drawBorderOfSelectedItem(int nextRow, int nextCol, int preRow, i
         border->show();
     }
 
+    emit itemContentChanged(QString(item(nextRow, nextCol) ?
+                                    item(nextRow, nextCol)->text() :
+                                    "").replace("<br>", "\n"));
+
     moveAnimation(nextRow, nextCol);
 }
 
@@ -311,10 +336,12 @@ void EditTable::menuPopuped(const QPoint &pos) {
 void EditTable::addTopLine() {
     if(currentRow() != -1) {
         insertRow(currentRow());
+        initRowItemContent(currentRow() - 1);
         moveAnimation(currentRow(), currentColumn());
     }
     else {
         insertRow(0);
+        initRowItemContent(0);
         setCurrentCell(0, 0);
     }
 
@@ -322,6 +349,7 @@ void EditTable::addTopLine() {
 void EditTable::addBottomLine() {
     bool currentCellVisible = currentRow() != -1;
     insertRow(currentRow() + 1);
+    initRowItemContent(currentRow() + 1);
     if(!currentCellVisible) {
         setCurrentCell(0, 0);
     }
@@ -331,20 +359,28 @@ void EditTable::addBottomLine() {
 }
 void EditTable::addLeftLine() {
     if(currentColumn() != -1) {
-        aligns.insert(currentColumn(), isAllColAlignSame() ? aligns[0] : DEFAULT_ALIGN);
+        aligns.insert(currentColumn(), isAllColAlignSame() ?
+                                       (aligns.length() > 0 ? aligns[0] : DEFAULT_ALIGN) :
+                                       DEFAULT_ALIGN);
         insertColumn(currentColumn());
+        initColItemContent(currentColumn() - 1);
         moveAnimation(currentRow(), currentColumn());
     }
     else {
         aligns.insert(0, DEFAULT_ALIGN);
         insertColumn(0);
+        initColItemContent(0);
         setCurrentCell(0, 0);
     }
 }
 void EditTable::addRightLine() {
     bool currentCellVisible = currentColumn() != -1;
-    aligns.insert(currentColumn() + 1, isAllColAlignSame() ? aligns[0] : DEFAULT_ALIGN);
+    aligns.insert(currentColumn() + 1, isAllColAlignSame() ?
+                                       (aligns.length() > 0 ? aligns[0] : DEFAULT_ALIGN) :
+                                       DEFAULT_ALIGN);
     insertColumn(currentColumn() + 1);
+
+    initColItemContent(currentColumn() + 1);
     if(!currentCellVisible) {
         setCurrentCell(0, 0);
     }
@@ -400,8 +436,17 @@ void EditTable::clearAll() {
     allAlign(DEFAULT_ALIGN);
 }
 
+void EditTable::changeCurrentItemContent(const QString &content) {
+    if(currentItem()) {
+        currentItem()->setText(QString(content).replace("\n", "<br>"));
+    }
+}
+
 void EditTable::alignCurEditedItem(int row, int col) {
     item(row, col)->setTextAlignment(aligns[col]);
+    if(item(row, col)->text() != "" && item(row, col) == currentItem()) {
+        emit itemContentChanged(QString(item(row, col) ? item(row, col)->text() : "").replace("<br>", "\n"));
+    }
 }
 
 void EditTable::generateMarkdownTextToClipBoard() {
