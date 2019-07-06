@@ -73,6 +73,7 @@ private slots:
     void alignCurEditedItem(int row, int col);
 
     void generateMarkdownTextToClipBoard();
+    void generateMarkdownTextToFile();
 
 signals:
     void itemContentChanged(const QString &content);

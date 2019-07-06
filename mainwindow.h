@@ -32,6 +32,7 @@ protected:
 
     void setWindowSize();
     void setWindowStyle();
+
     void initWindowComponent(QWidget *contentWidget);
 
     void dragDirectionHandle(const QPoint &cursorGlobalPoint);

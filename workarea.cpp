@@ -16,6 +16,8 @@ WorkArea::WorkArea(QWidget *parent) : QWidget(parent) {
 
     connect(operateBoard->getGenerateMarkdownTextToClipBoardBtn(), SIGNAL(clicked(bool)),
             editTable, SLOT(generateMarkdownTextToClipBoard()));
+    connect(operateBoard->getGenerateMarkdownTextToMDFileBtn(), SIGNAL(clicked(bool)),
+            editTable, SLOT(generateMarkdownTextToFile()));
     connect(operateBoard->getTableItemDataTextEdit(), SIGNAL(textEditContentChanged(QString)),
             editTable, SLOT(changeCurrentItemContent(QString)));
     connect(editTable, SIGNAL(itemContentChanged(QString)),

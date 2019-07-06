@@ -14,14 +14,12 @@ public:
 
     Button *getGenerateMarkdownTextToClipBoardBtn() const;
     Button *getGenerateMarkdownTextToMDFileBtn() const;
-    Button *getOpenGuideBtn() const;
     TextEdit *getTableItemDataTextEdit() const;
 
 private:
     QVBoxLayout *layout;
     TextEdit *tableItemDataTextEdit;
-    Button *openGuideBtn,
-           *generateMarkdownTextToClipBoardBtn,
+    Button *generateMarkdownTextToClipBoardBtn,
            *generateMarkdownTextToMDFileBtn;
 };
 

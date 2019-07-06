@@ -14,6 +14,10 @@
 #include <QBrush>
 #include <QClipboard>
 #include <QGuiApplication>
+#include <QFileDialog>
+#include <QIODevice>
+#include <QTextStream>
+#include <QFile>
 #include <QDebug>
 
 EditTable::EditTable(int row, int col, QWidget *parent) :
@@ -452,4 +456,16 @@ void EditTable::alignCurEditedItem(int row, int col) {
 void EditTable::generateMarkdownTextToClipBoard() {
     clipBoard = QGuiApplication::clipboard();
     clipBoard->setText(generateMarkdownText());
+}
+
+void EditTable::generateMarkdownTextToFile() {
+    QString fileName = QFileDialog::getSaveFileName(this, tr("保存为markdown文件"),
+                                                    "1.md", "Markdown files(*.md)");
+    QFile file(fileName);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    QTextStream stream(&file);
+    stream << generateMarkdownText();
+
+    file.close();
 }
